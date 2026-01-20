@@ -3,9 +3,12 @@ process JAFFAL {
     label 'process_medium'
 
     conda "bioconda::jaffa=2.3.0"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/jaffa:2.3--hdfd78af_0' :
-        'quay.io/biocontainers/jaffa:2.3--hdfd78af_0' }"
+    container "docker.io/wdesaint/jaffal_older_bpipe:latest"
+    // container "file:///hpc/hers_en/edejong2/software/singularity_cache/ghcr.io-kennalab-jaffa-2.4.sif"
+    // container "docker.io/davidsongroup/jaffa:2.4"
+    // container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    //     'https://depot.galaxyproject.org/singularity/jaffa:2.3--hdfd78af_0' :
+    //     'quay.io/biocontainers/jaffa:2.3--hdfd78af_0' }"
 
     input:
     tuple val(meta), path(fastq)
@@ -25,7 +28,7 @@ process JAFFAL {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        jaffa: \$( echo 'jaffa 2.0' )
+        jaffa: \$( echo 'jaffa 2.4?' )
     END_VERSIONS
     """
 }
