@@ -437,7 +437,7 @@ workflow NANOSEQ{
         MULTIQC (
         ch_multiqc_config,
         ch_multiqc_custom_config.collect().ifEmpty([]),
-        ch_fastqc_multiqc.ifEmpty([]),
+        ch_fastqc_multiqc.collect().ifEmpty([]),
         ch_samtools_multiqc.collect().ifEmpty([]),
         ch_featurecounts_gene_multiqc.ifEmpty([]),
         ch_featurecounts_multiqc_biotype.ifEmpty([]),
