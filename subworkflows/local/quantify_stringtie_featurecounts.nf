@@ -5,6 +5,7 @@
 include { STRINGTIE2            } from '../../modules/local/stringtie2'
 include { STRINGTIE_MERGE       } from '../../modules/nf-core/stringtie/merge/main'
 include { SUBREAD_FEATURECOUNTS } from '../../modules/local/subread_featurecounts'
+include { MULTIQC_CUSTOM_BIOTYPE} from '../../modules/local/multiqc_custom_biotype'
 
 workflow QUANTIFY_STRINGTIE_FEATURECOUNTS {
     take:
@@ -43,11 +44,21 @@ workflow QUANTIFY_STRINGTIE_FEATURECOUNTS {
         .collect { it[-1]    }
         .set     { ch_sample }
     SUBREAD_FEATURECOUNTS ( ch_stringtie_merged_gtf, ch_sample )
+
+    // Custom BIOTYPE plot from featurecounts output.
+    ch_biotypes_header_multiqc   = file("$projectDir/assets/multiqc/biotypes_header.txt", checkIfExists: true)
+
+    MULTIQC_CUSTOM_BIOTYPE (
+            SUBREAD_FEATURECOUNTS.out.gene_counts,
+            ch_biotypes_header_multiqc
+        )
     ch_gene_counts                   = SUBREAD_FEATURECOUNTS.out.gene_counts
     ch_transcript_counts             = SUBREAD_FEATURECOUNTS.out.transcript_counts
     featurecounts_gene_multiqc       = SUBREAD_FEATURECOUNTS.out.featurecounts_gene_multiqc
     featurecounts_transcript_multiqc = SUBREAD_FEATURECOUNTS.out.featurecounts_transcript_multiqc
     featurecounts_version            = SUBREAD_FEATURECOUNTS.out.versions
+    featurecounts_biotype_version    = MULTIQC_CUSTOM_BIOTYPE.out.versions.first()
+    featurecounts_multiqc_biotype    = MULTIQC_CUSTOM_BIOTYPE.out.tsv
 
     emit:
     ch_stringtie_gtf
@@ -58,4 +69,6 @@ workflow QUANTIFY_STRINGTIE_FEATURECOUNTS {
     featurecounts_transcript_multiqc
     stringtie2_version
     featurecounts_version
+    featurecounts_biotype_version
+    featurecounts_multiqc_biotype
 }

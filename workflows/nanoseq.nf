@@ -384,8 +384,10 @@ workflow NANOSEQ{
             ch_transcript_counts                = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.ch_transcript_counts
             ch_software_versions                = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.stringtie2_version.first().ifEmpty(null))
             ch_software_versions                = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_version.first().ifEmpty(null))
+            ch_software_versions                = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_biotype_version.first().ifEmpty(null))
             ch_featurecounts_gene_multiqc       = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_gene_multiqc.ifEmpty([])
             ch_featurecounts_transcript_multiqc = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_transcript_multiqc.ifEmpty([])
+            ch_featurecounts_multiqc_biotype    = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_multiqc_biotype.ifEmpty([])
         }
         if (!params.skip_differential_analysis) {
 
@@ -438,6 +440,7 @@ workflow NANOSEQ{
         ch_fastqc_multiqc.ifEmpty([]),
         ch_samtools_multiqc.collect().ifEmpty([]),
         ch_featurecounts_gene_multiqc.ifEmpty([]),
+        ch_featurecounts_multiqc_biotype.ifEmpty([]),
         ch_featurecounts_transcript_multiqc.ifEmpty([]),
         CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
