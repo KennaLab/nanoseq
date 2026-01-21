@@ -56,7 +56,7 @@ workflow QUANTIFY_STRINGTIE_FEATURECOUNTS {
         .map {meta, fasta, gtf, bam ->
             def fmeta = [:]
             // Set meta.id
-            fmeta.id = meta
+            fmeta.id = meta.id
             // Set meta.single_end
             fmeta.single_end = true
             return [fmeta, bam, gtf]
