@@ -105,8 +105,7 @@ include { GET_NANOLYSE_FASTA    } from '../modules/local/get_nanolyse_fasta'
 include { QCAT                  } from '../modules/local/qcat'
 include { BAM_RENAME            } from '../modules/local/bam_rename'
 include { BAMBU                 } from '../modules/local/bambu'
-include { MULTIQC               } from '../modules/local/multiqc'
-
+include { MULTIQC               } from '../modules/nf-core/multiqc/main'
 /*
  * SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
  */
