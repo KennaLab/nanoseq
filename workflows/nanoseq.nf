@@ -183,7 +183,7 @@ workflow NANOSEQ{
      * SUBWORKFLOW: Read in samplesheet, validate and stage input files
      */
     INPUT_CHECK ( ch_input, ch_input_path )
-        .set { ch_sample }
+        .set { ch_sample }  // [ sample, barcode, fasta, gtf, is_transcripts, annotation_str ]
 
     if (!params.skip_demultiplexing) {
 

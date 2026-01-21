@@ -15,16 +15,15 @@ include { SUBREAD_FEATURECOUNTS as SUBREAD_FEATURECOUNTS_TRANSCRIPT } from '../.
 
 workflow QUANTIFY_STRINGTIE_FEATURECOUNTS {
     take:
-    ch_sample
+    ch_sample     // [ sample, barcode, fasta, gtf, is_transcripts, annotation_str ]
     ch_sortbam
 
     main:
 
-    //tuple val(meta), path(fasta), path(gtf), path(bam)
     ch_sample
         .map  { it -> [ it[0], it[2], it[3] ] }
         .join ( ch_sortbam )
-        .set  { ch_sample }
+        .set  { ch_sample } //tuple val(meta), path(fasta), path(gtf), path(bam)
 
     /*
      * Novel isoform detection with StringTie
@@ -54,7 +53,14 @@ workflow QUANTIFY_STRINGTIE_FEATURECOUNTS {
 
 
     ch_sample
-        .map  { it -> [ it[0], it[3], it[2] ]}
+        .map {meta, fasta, gtf, bam ->
+            def fmeta = [:]
+            // Set meta.id
+            fmeta.id = meta
+            // Set meta.single_end
+            fmeta.single_end = true
+            return [fmeta, bam, gtf]
+        }
         .set { ch_bam_gtf }
 
     // Run subread featurecounts with different meta_features.
