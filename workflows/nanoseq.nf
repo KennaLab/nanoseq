@@ -438,20 +438,33 @@ workflow NANOSEQ{
         ch_workflow_summary = Channel.value(workflow_summary)
 
         /*
-         * MODULE: MultiQC
-         */
+        * MODULE: MultiQC
+        */
+        ch_multiqc_files = Channel.empty()
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_fastqc_multiqc.collect().ifEmpty([]),
+            ch_nanoplot_multiqc.collect().ifEmpty([]),
+            ch_samtools_multiqc.collect().ifEmpty([]),
+            ch_featurecounts_gene_multiqc.ifEmpty([]),
+            ch_featurecounts_transcript_multiqc_biotype.ifEmpty([]),
+            ch_featurecounts_gene_multiqc_biotype.ifEmpty([]),
+            ch_featurecounts_transcript_multiqc.ifEmpty([]),
+            CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
+
+        )
+
+        ch_multiqc_logo = params.multiqc_logo
+            ? Channel.fromPath(params.multiqc_logo, checkIfExists: true)
+            : Channel.empty()
+
         MULTIQC (
-        ch_multiqc_config,
-        ch_multiqc_custom_config.collect().ifEmpty([]),
-        ch_fastqc_multiqc.collect().ifEmpty([]),
-        ch_nanoplot_multiqc.collect().ifEmpty([]),
-        ch_samtools_multiqc.collect().ifEmpty([]),
-        ch_featurecounts_gene_multiqc.ifEmpty([]),
-        ch_featurecounts_transcript_multiqc_biotype.ifEmpty([]),
-        ch_featurecounts_gene_multiqc_biotype.ifEmpty([]),
-        ch_featurecounts_transcript_multiqc.ifEmpty([]),
-        CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
-        ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
+            ch_multiqc_files.collect(),
+            ch_multiqc_config.toList(),
+            ch_multiqc_custom_config.collect().ifEmpty([]),
+            ch_multiqc_logo.toList(),
+            [],
+            [],
         )
     }
 }
