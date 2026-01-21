@@ -22,7 +22,7 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "ee80d14721e76e2e079103b8dcd5d57129e584ba",
+                        "git_sha": "80cba9452fb1e9bb79884976fa1ca0e671949aa2",
                         "installed_by": ["modules"]
                     },
                     "nanolyse": {
@@ -68,6 +68,11 @@
                     "stringtie/merge": {
                         "branch": "master",
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "installed_by": ["modules"]
+                    },
+                    "subread/featurecounts": {
+                        "branch": "master",
+                        "git_sha": "41dfa3f7c0ffabb96a6a813fe321c6d1cc5b6e46",
                         "installed_by": ["modules"]
                     },
                     "tabix/bgzip": {
