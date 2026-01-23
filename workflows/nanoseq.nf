@@ -90,13 +90,6 @@ if (!params.skip_quantification) {
 }
 
 ////////////////////////////////////////////////////
-/* --          CONFIG FILES                    -- */
-////////////////////////////////////////////////////
-
-ch_multiqc_config        = file("$baseDir/assets/multiqc_config.yml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
-
-////////////////////////////////////////////////////
 /* --    IMPORT LOCAL MODULES/SUBWORKFLOWS     -- */
 ////////////////////////////////////////////////////
 
@@ -381,17 +374,17 @@ workflow NANOSEQ{
              * SUBWORKFLOW: Novel isoform detection with StringTie and Quantification with featureCounts
              */
             QUANTIFY_STRINGTIE_FEATURECOUNTS( ch_sample, ch_sortbam )
-            ch_gene_counts                              = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.ch_gene_counts
-            ch_transcript_counts                        = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.ch_transcript_counts
+            ch_gene_counts                              = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.ch_gene_counts.collect { it[1] }.ifEmpty([])
+            ch_transcript_counts                        = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.ch_transcript_counts.collect { it[1] }.ifEmpty([])
             ch_software_versions                        = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.stringtie2_version.first().ifEmpty(null))
             ch_software_versions                        = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_gene_version.first().ifEmpty(null))
             ch_software_versions                        = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_transcript_version.first().ifEmpty(null))
             ch_software_versions                        = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_biotype_gene_version.first().ifEmpty(null))
             ch_software_versions                        = ch_software_versions.mix(QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_biotype_transcript_version.first().ifEmpty(null))
-            ch_featurecounts_gene_multiqc               = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_gene_multiqc.ifEmpty([])
-            ch_featurecounts_transcript_multiqc         = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_transcript_multiqc.ifEmpty([])
-            ch_featurecounts_transcript_multiqc_biotype = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_multiqc_biotype_transcript.ifEmpty([])
-            ch_featurecounts_gene_multiqc_biotype       = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_multiqc_biotype_gene.ifEmpty([])
+            ch_featurecounts_gene_multiqc               = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_gene_multiqc.collect { it[1] }.ifEmpty([])
+            ch_featurecounts_transcript_multiqc         = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_transcript_multiqc.collect { it[1] }.ifEmpty([])
+            ch_featurecounts_transcript_multiqc_biotype = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_multiqc_biotype_transcript.collect { it[1] }.ifEmpty([])
+            ch_featurecounts_gene_multiqc_biotype       = QUANTIFY_STRINGTIE_FEATURECOUNTS.out.featurecounts_multiqc_biotype_gene.collect { it[1] }.ifEmpty([])
 
         }
         if (!params.skip_differential_analysis) {
@@ -453,6 +446,14 @@ workflow NANOSEQ{
 
         )
 
+        ch_multiqc_config = Channel.fromPath(
+            "${projectDir}/assets/multiqc_config.yml",
+            checkIfExists: true
+        )
+        ch_multiqc_custom_config = params.multiqc_config
+            ? Channel.fromPath(params.multiqc_config, checkIfExists: true)
+            : Channel.empty()
+
         ch_multiqc_logo = params.multiqc_logo
             ? Channel.fromPath(params.multiqc_logo, checkIfExists: true)
             : Channel.empty()
@@ -460,7 +461,7 @@ workflow NANOSEQ{
         MULTIQC (
             ch_multiqc_files.collect(),
             ch_multiqc_config.toList(),
-            ch_multiqc_custom_config.collect().ifEmpty([]),
+            ch_multiqc_custom_config.toList(),
             ch_multiqc_logo.toList(),
             [],
             [],
