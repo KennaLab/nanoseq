@@ -20,7 +20,7 @@ process MULTIQC_CUSTOM_BIOTYPE {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    cut -f 1,7 $count | tail -n +3 | cat $header - >> ${prefix}.biotype_counts_mqc.tsv
+    cut -f 1,6 $count | tail -n +3 | cat $header - >> ${prefix}.biotype_counts_mqc.tsv
 
     mqc_features_stat.py \\
         ${prefix}.biotype_counts_mqc.tsv \\
