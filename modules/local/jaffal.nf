@@ -1,4 +1,5 @@
 process JAFFAL {
+    tag "$meta.id"
     label 'process_medium'
 
     conda "bioconda::jaffa=2.3.0"
