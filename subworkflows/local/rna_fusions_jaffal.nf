@@ -28,12 +28,7 @@ workflow RNA_FUSIONS_JAFFAL {
         UNTAR.out.untar
             .map { it -> [ it[1] ]}
             .set { ch_jaffal_ref_dir }
-
-    ch_jaffal_ref_dir.view()
-
     }
-
-    ch_sample_simple.view()
 
     /*
     * Align current signals to reference with jaffel
